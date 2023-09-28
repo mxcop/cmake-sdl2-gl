@@ -1,0 +1,5 @@
+# build dir
+/bin
+
+# assets dir
+!/assets
