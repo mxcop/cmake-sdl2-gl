@@ -1,11 +1,15 @@
 cmake_minimum_required(VERSION 3.15)
 project(sdl_app)
 
+# Set C++ 11 standard
 set( CMAKE_CXX_STANDARD 11 CACHE STRING "" FORCE )
 set( CMAKE_EXPORT_COMPILE_COMMANDS ON CACHE BOOL "" FORCE )
 
+# Create executable target
 add_executable( main )
 set_target_properties( main PROPERTIES OUTPUT_NAME ${CMAKE_PROJECT_NAME} )
+
+# Post build command (runs the exe)
 add_custom_command( TARGET main POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
     ${CMAKE_SOURCE_DIR}/assets
@@ -13,6 +17,11 @@ add_custom_command( TARGET main POST_BUILD
     COMMAND ${CMAKE_BINARY_DIR}/Debug/${CMAKE_PROJECT_NAME}
 )
 
+# Add header include directory
+target_include_directories( main PRIVATE "src" "inc" )
+# target_precompile_headers( main PRIVATE "inc/types.h" )
+
+# Sub-directories
 add_subdirectory( "src" )
 add_subdirectory( "extern" )
 

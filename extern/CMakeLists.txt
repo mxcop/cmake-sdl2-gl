@@ -42,6 +42,7 @@ target_link_libraries(main SDL2::SDL2main SDL2::SDL2-static)
 # GLM
 # https://github.com/g-truc/glm
 target_include_directories(main SYSTEM PRIVATE "glm")
+target_precompile_headers(main PRIVATE "glm/glm/fwd.hpp")
 
 # GLAD
 # https://github.com/Dav1dde/glad

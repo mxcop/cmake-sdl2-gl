@@ -1,9 +1,12 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <string>
 
 #include <glad/gl.h>
 #include <SDL.h>
 #include <SDL_opengl.h>
+
+#include "engine/shader.h"
 
 constexpr GLuint WIDTH = 800, HEIGHT = 600;
 
@@ -29,6 +32,16 @@ int main( int argc, char** argv ) {
     int version = gladLoadGL((GLADloadfunc) SDL_GL_GetProcAddress);
     printf("GL %d.%d\n", GLAD_VERSION_MAJOR(version), GLAD_VERSION_MINOR(version));
 
+    const std::string vert_src =
+	#include "engine/shaders/sprite.vert"
+	;
+
+	const std::string frag_src =
+	#include "engine/shaders/sprite.frag"
+	;
+
+    Shader shader = Shader(vert_src.c_str(), frag_src.c_str());
+
     int exit = 0;
     while(!exit) {
         SDL_Event event;
@@ -49,6 +62,8 @@ int main( int argc, char** argv ) {
 
         glClearColor(0.105f, 0.105f, 0.105f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
+
+        shader.use();
 
         SDL_GL_SwapWindow(window);
         SDL_Delay(1);
