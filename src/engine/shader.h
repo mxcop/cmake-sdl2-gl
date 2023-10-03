@@ -2,6 +2,8 @@
 
 class Shader
 {
+    bool compile(const char* vert_src, const char* frag_src, const char* geo_src = nullptr);
+
 public:
     uint32_t id = 0u;
     Shader() = default;
@@ -22,7 +24,4 @@ public:
     void set_vec4f(const char* name, float x, float y, float z, float w);
     void set_vec4f(const char* name, const glm::vec4& value);
     void set_mat4(const char* name, const glm::mat4& matrix);
-
-private:
-    bool compile(const char* vert_src, const char* frag_src, const char* geo_src = nullptr);
 };

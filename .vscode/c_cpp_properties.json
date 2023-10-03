@@ -8,9 +8,12 @@
                 "src",
                 "extern/**"
             ],
-            "forcedInclude": ["extern/glm/glm/fwd.hpp"],
+            "forcedInclude": [
+                "extern/glm/glm/fwd.hpp"
+            ],
             "cStandard": "c11",
-            "cppStandard": "c++17"
+            "cppStandard": "c++17",
+            "configurationProvider": "ms-vscode.cmake-tools"
         }
     ],
     "version": 4

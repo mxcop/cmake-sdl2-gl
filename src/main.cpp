@@ -3,12 +3,25 @@
 #include <string>
 
 #include <glad/gl.h>
+#include <glm/glm.hpp>
 #include <SDL.h>
 #include <SDL_opengl.h>
 
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb_image.h>
+#include <filesystem>
+#include <stdlib.h>
+
 #include "engine/shader.h"
+#include "engine/texture.h"
+#include "engine/sprite.h"
 
 constexpr GLuint WIDTH = 800, HEIGHT = 600;
+
+std::string relative_path(const char* p)
+{
+	return std::filesystem::absolute(p).string();
+}
 
 int main( int argc, char** argv ) {
     // code without checking for errors
@@ -40,7 +53,30 @@ int main( int argc, char** argv ) {
 	#include "engine/shaders/sprite.frag"
 	;
 
-    Shader shader = Shader(vert_src.c_str(), frag_src.c_str());
+    Shader* shader = new Shader(vert_src.c_str(), frag_src.c_str());
+
+    int width, height, nr_channels;
+    std::string path = relative_path("./assets/player.png");
+    unsigned char* data = stbi_load(path.c_str(), &width, &height, &nr_channels, 0);
+
+    const char* error = stbi_failure_reason();
+
+    if (error != nullptr)
+    {
+        printf("Error loading texture :\n%s", error);
+
+        SDL_GL_DeleteContext(context);
+        SDL_DestroyWindow(window);
+        SDL_Quit();
+
+        return 0;
+    }
+
+    Texture* texture = new Texture(width, height, data, GL_RGBA);
+
+    stbi_image_free(data);
+
+    Sprite* sprite = new Sprite(shader, texture);
 
     int exit = 0;
     while(!exit) {
@@ -63,11 +99,13 @@ int main( int argc, char** argv ) {
         glClearColor(0.105f, 0.105f, 0.105f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        shader.use();
+        sprite->draw(glm::vec2(0.0f, 0.0f), glm::vec2(1.0f, 1.0f), 0.0f);
 
         SDL_GL_SwapWindow(window);
         SDL_Delay(1);
     }
+
+    delete sprite;
 
     SDL_GL_DeleteContext(context);
     SDL_DestroyWindow(window);

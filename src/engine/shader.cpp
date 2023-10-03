@@ -64,7 +64,8 @@ bool Shader::compile(const char *vert_src, const char *frag_src, const char *geo
     glCompileShader(frag_shader);
     if (!log_err(frag_shader, "FRAGMENT")) return false;
 
-    if (geo_src != nullptr) {
+    if (geo_src != nullptr) 
+    {
         /* Compile geometry shader */
         geo_shader = glCreateShader(GL_GEOMETRY_SHADER);
         glShaderSource(geo_shader, 1, &geo_src, NULL);
@@ -78,7 +79,8 @@ bool Shader::compile(const char *vert_src, const char *frag_src, const char *geo
     /* Attach the compiled shaders */
     glAttachShader(this->id, vert_shader);
     glAttachShader(this->id, frag_shader);
-    if (geo_src != nullptr) {
+    if (geo_src != nullptr) 
+    {
         glAttachShader(this->id, geo_shader);
     }
 
@@ -92,7 +94,8 @@ bool Shader::compile(const char *vert_src, const char *frag_src, const char *geo
     */
     glDeleteShader(vert_shader);
     glDeleteShader(frag_shader);
-    if (geo_src != nullptr) {
+    if (geo_src != nullptr) 
+    {
         glDeleteShader(geo_shader);
     }
 
