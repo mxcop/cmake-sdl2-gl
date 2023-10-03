@@ -99,10 +99,10 @@ int main( int argc, char** argv ) {
         glClearColor(0.105f, 0.105f, 0.105f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        sprite->draw(glm::vec2(0.0f, 0.0f), glm::vec2(1.0f, 1.0f), 0.0f);
+        sprite->draw(glm::vec2(0.0f, 0.0f), glm::vec2(2.0f, 2.0f), 0.0f);
 
         SDL_GL_SwapWindow(window);
-        SDL_Delay(1);
+        SDL_Delay(5);
     }
 
     delete sprite;
