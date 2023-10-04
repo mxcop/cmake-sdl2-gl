@@ -20,8 +20,6 @@
 #include "engine/texture.h"
 #include "engine/sprite.h"
 
-constexpr GLuint WIDTH = 1920, HEIGHT = 1080;
-
 std::string relative_path(const char* p)
 {
 	return std::filesystem::absolute(p).string();
@@ -44,7 +42,7 @@ int main( int argc, char** argv ) {
         "[glad] GL with SDL",
         SDL_WINDOWPOS_CENTERED,
         SDL_WINDOWPOS_CENTERED,
-        WIDTH, HEIGHT,
+        WIN_WIDTH, WIN_HEIGHT,
         SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN | SDL_WINDOW_ALLOW_HIGHDPI
     );
     SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest");

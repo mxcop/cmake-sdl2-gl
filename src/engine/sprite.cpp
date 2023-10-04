@@ -75,7 +75,7 @@ void Sprite::draw(glm::vec2 position, glm::vec2 size, float rotate)
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
 
-    float aspect_ratio = 1920.0f / 1080.0f;
+    float aspect_ratio = static_cast<float>(WIN_WIDTH) / WIN_HEIGHT;
     glm::mat4 proj = glm::ortho(0.0f, 12.0f * aspect_ratio, 0.0f, 12.0f, 0.0f, 1000.0f);
 
 	// Compute the model matrix:

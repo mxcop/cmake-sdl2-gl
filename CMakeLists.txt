@@ -23,7 +23,7 @@ add_custom_command( TARGET main POST_BUILD
 
 # Add header include directory
 target_include_directories( main PRIVATE "src" "inc" )
-# target_precompile_headers( main PRIVATE "inc/types.h" )
+target_precompile_headers( main PRIVATE "inc/common.h" )
 
 # Sub-directories
 add_subdirectory( "src" )
