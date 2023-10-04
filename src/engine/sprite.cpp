@@ -58,6 +58,8 @@ Sprite::Sprite(Shader *shader, Texture *texture)
 {
     this->shader = shader;
     this->tex = texture;
+
+    init();
 }
 
 Sprite::~Sprite()
@@ -73,14 +75,13 @@ void Sprite::draw(glm::vec2 position, glm::vec2 size, float rotate)
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
 
-    float aspect_ratio = 800.0f / 600.0f;
-    glm::mat4 proj = glm::ortho(0.0f, 64.0f * aspect_ratio, 0.0f, 36.0f, 0.0f, 1000.0f);
+    float aspect_ratio = 1920.0f / 1080.0f;
+    glm::mat4 proj = glm::ortho(0.0f, 12.0f * aspect_ratio, 0.0f, 12.0f, 0.0f, 1000.0f);
 
 	// Compute the model matrix:
 	glm::mat4 model = glm::mat4(1.0f/* Identity matrix */);
 	model = glm::translate(model, glm::vec3(position, 0.0f));
 
-	// model = glm::translate(model, glm::vec3(0.5f, 0.5f, 0.0f));
 	model = glm::rotate(model, rotate, glm::vec3(0.0f, 0.0f, 1.0f));
 	model = glm::scale(model, glm::vec3(size, 1.0f));
 	model = glm::translate(model, -glm::vec3(0.5f, 0.5f, 0.0f));
@@ -89,9 +90,9 @@ void Sprite::draw(glm::vec2 position, glm::vec2 size, float rotate)
 	shader->use();
     shader->set_mat4("projection", proj);
 	shader->set_mat4("model", model);
-	// shader->set_int("frame", 0);
-	// shader->set_int("frames", 1);
-	// shader->set_int("flip_x", false);
+	shader->set_int("frame", 0);
+	shader->set_int("frames", 1);
+	shader->set_int("flip_x", false);
 	tex->bind();
 
 	// Draw the quad with texture.
