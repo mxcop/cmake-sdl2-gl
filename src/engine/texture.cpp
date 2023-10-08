@@ -1,41 +1,73 @@
 #include "texture.h"
 
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb_image.h>
+#include <filesystem>
 #include <glad/gl.h>
 
-Texture::Texture(uint32_t width, uint32_t height, uint8_t* data, uint32_t img_fmt)
-    : wrap_s(GL_REPEAT), wrap_t(GL_REPEAT), filter_min(GL_NEAREST), filter_max(GL_NEAREST)
+/**
+ * @brief Convert a relative path to an absolute one.
+ */
+std::string relative_path(const char* p)
 {
-    this->int_fmt = img_fmt;
-    this->img_fmt = img_fmt;
-
-    gen(width, height, data);
+	return std::filesystem::absolute(p).string();
 }
 
-void Texture::gen(uint32_t width, uint32_t height, uint8_t* data)
+bool texture_load(Texture* out_tex, const char* file_path)
 {
-    this->width = width;
-    this->height = height;
+    /* Assert if the output texture pointer is a nullptr */
+    assert(out_tex != nullptr);
+
+    /* Get the relative file path */
+    std::string path = relative_path(file_path); /* ./assets/.. */
+
+    /* Load the image file */
+    int nr_channels = 0;
+    uint8_t* data = stbi_load(path.c_str(), &out_tex->width, &out_tex->height, &nr_channels, 0);
+
+    /* Check if loading the file caused an error */
+    if (stbi_failure_reason() != nullptr)
+    {
+        return false;
+    }
+
+    /* Image format */
+    uint32_t img_fmt;
+    switch (nr_channels)
+    {
+    case 3:
+        img_fmt = GL_RGB;
+        break;
+    case 4:
+        img_fmt = GL_RGBA;
+        break;
+    default:
+        return false;
+    }
 
     /* Create a new texture */
-    glGenTextures(1, &this->id);
-    glBindTexture(GL_TEXTURE_2D, this->id);
+    glGenTextures(1, &out_tex->id);
+    glBindTexture(GL_TEXTURE_2D, out_tex->id);
 
     /* Set wrap and filter modes */
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, this->wrap_s);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, this->wrap_t);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, this->filter_min);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, this->filter_max);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
     /* Generate the image */
-    glTexImage2D(GL_TEXTURE_2D, 0, this->int_fmt, width, height, 0, this->img_fmt, GL_UNSIGNED_BYTE, data);
+    glTexImage2D(GL_TEXTURE_2D, 0, img_fmt, out_tex->width, out_tex->height, 0, img_fmt, GL_UNSIGNED_BYTE, data);
 
     /* Cleanup */
     glBindTexture(GL_TEXTURE_2D, 0);
+    stbi_image_free(data);
+
+    return true;
 }
 
-void Texture::bind(int tex_idx) const
+void texture_bind(const Texture *tex, int bind_id)
 {
     /* Bind our texture id */
-    glActiveTexture(GL_TEXTURE0 + tex_idx);
-    glBindTexture(GL_TEXTURE_2D, this->id);
+    glActiveTexture(GL_TEXTURE0 + bind_id);
+    glBindTexture(GL_TEXTURE_2D, tex->id);
 }

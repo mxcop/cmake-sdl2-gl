@@ -61,7 +61,11 @@
         "xmemory": "cpp",
         "xstddef": "cpp",
         "xtr1common": "cpp",
-        "xtree": "cpp"
+        "xtree": "cpp",
+        "*.frag": "cpp"
     },
-    "cmake.buildDirectory": "${workspaceFolder}/bin"
+    "cmake.buildDirectory": "${workspaceFolder}/bin",
+    "C_Cpp.clang_format_fallbackStyle": "Google",
+    "dotnet.defaultSolution": "disable",
+    "cmake.configureOnOpen": false,
 }

@@ -1,26 +1,23 @@
 #pragma once
 
-class Shader;
-class Texture;
+/* Includes because of Data members */
+#include "shader.h"
+#include "texture.h"
 
-class Sprite 
-{
-    Shader* shader;
-    Texture* tex;
+struct Sprite {
+    Shader shader;
+    Texture tex;
 
+    /* Buffer indices for drawing */
     uint32_t vao, vbo, ebo;
-
-    void init();
-
-public:
-    /**
-     * @warning The Sprite takes ownership of both the [shader] and the [texture]!
-     */
-    Sprite(Shader* shader, Texture* texture);
-	~Sprite();
 
     /**
      * @brief Draw sprite to the screen.
      */
     void draw(glm::vec2 position, glm::vec2 size, float rotate = 0.0f);
 };
+
+/**
+ * @brief Create a new sprite from a shader and texture.
+ */
+Sprite sprite_from(Shader shader, Texture texture);

@@ -1,0 +1,115 @@
+# Max <mxcop> ' clang-format
+# 08/10/2023
+
+BasedOnStyle: Google
+IndentWidth: 4
+TabWidth: 4
+UseTab: Never
+ColumnLimit: 80
+
+# Whitespace
+KeepEmptyLinesAtEOF: true
+MaxEmptyLinesToKeep: 1
+LineEnding: CRLF
+SpaceAfterCStyleCast: false
+SpaceAfterLogicalNot: false
+SpaceAfterTemplateKeyword: true
+SpaceBeforeAssignmentOperators: true
+SpaceBeforeCaseColon: false
+SpaceBeforeCpp11BracedList: true
+SpaceBeforeCtorInitializerColon: true
+SpaceBeforeInheritanceColon: true
+SpaceBeforeParens: ControlStatements
+SpaceBeforeRangeBasedForLoopColon: true
+SpaceBeforeSquareBrackets: false
+SpaceInEmptyBlock: false
+SpacesInAngles: Never
+SpacesInContainerLiterals: true
+
+# Variables and Literals
+AlignConsecutiveAssignments: Consecutive
+AlignConsecutiveBitFields: Consecutive
+AlignConsecutiveDeclarations: None
+AlignArrayOfStructures: Left
+AlignOperands: AlignAfterOperator
+AlwaysBreakBeforeMultilineStrings: false
+BitFieldColonSpacing: Both
+BreakArrays: false
+BreakBeforeBinaryOperators: All
+Cpp11BracedListStyle: false
+IntegerLiteralSeparator:
+  Binary: 4
+  Decimal: 3
+  Hex: -1
+PointerAlignment: Left
+SpaceAroundPointerQualifiers: Before
+ReferenceAlignment: Left
+QualifierAlignment: Left
+
+# Macros
+AlignConsecutiveMacros:
+  Enabled: true
+  AcrossEmptyLines: false
+  AcrossComments: false
+AlignEscapedNewlines: Left
+IndentPPDirectives: None
+
+# Switch statements / Case statements
+AlignConsecutiveShortCaseStatements:
+  Enabled: true
+  AcrossEmptyLines: true
+  AcrossComments: true
+  AlignCaseColons: false
+AllowShortCaseLabelsOnASingleLine: true
+IndentCaseBlocks: true
+IndentCaseLabels: true
+
+# Comments
+AlignTrailingComments: Never
+
+# Functions
+AllowAllArgumentsOnNextLine: true
+AllowAllParametersOfDeclarationOnNextLine: true
+AllowShortFunctionsOnASingleLine: InlineOnly
+AlwaysBreakAfterReturnType: None
+BreakAfterAttributes: Leave
+BreakConstructorInitializers: BeforeComma
+
+# Code blocks
+AllowShortBlocksOnASingleLine: true
+AllowShortLoopsOnASingleLine: true
+BreakBeforeBraces: Mozilla
+KeepEmptyLinesAtTheStartOfBlocks: false
+
+# Namespaces
+CompactNamespaces: false
+FixNamespaceComments: true
+NamespaceIndentation: Inner
+SortUsingDeclarations: LexicographicNumeric
+
+# Enums
+AllowShortEnumsOnASingleLine: true
+
+# If statements
+AllowShortIfStatementsOnASingleLine: WithoutElse
+BreakBeforeTernaryOperators: true
+IndentGotoLabels: true
+
+# Lambdas
+AllowShortLambdasOnASingleLine: None
+
+# Classes and Structs
+BreakInheritanceList: BeforeComma
+EmptyLineAfterAccessModifier: Never
+EmptyLineBeforeAccessModifier: LogicalBlock
+IndentAccessModifiers: false
+
+# Templates
+AlwaysBreakTemplateDeclarations: Yes
+BreakBeforeConceptDeclarations: Always
+
+# Inline assembly
+BreakBeforeInlineASMColon: Always
+
+# Includes
+IncludeBlocks: Regroup

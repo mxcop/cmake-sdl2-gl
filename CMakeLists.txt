@@ -17,9 +17,9 @@ add_custom_command( TARGET main POST_BUILD
 )
 
 # Post build command (runs the exe)
-add_custom_command( TARGET main POST_BUILD
-    COMMAND cd "${PROJECT_BINARY_DIR}/$<CONFIG>/" && ${CMAKE_PROJECT_NAME}
-)
+# add_custom_command( TARGET main POST_BUILD
+#     COMMAND cd "${PROJECT_BINARY_DIR}/$<CONFIG>/" && ${CMAKE_PROJECT_NAME}
+# )
 
 # Add header include directory
 target_include_directories( main PRIVATE "src" "inc" )

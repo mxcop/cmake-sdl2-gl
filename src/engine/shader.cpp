@@ -6,46 +6,12 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-Shader::Shader(const char *vert_src, const char *frag_src, const char *geo_src)
-{
-    compile(vert_src, frag_src, geo_src);
-}
-
-Shader &Shader::use()
-{
-    glUseProgram(this->id);
-    return *this;
-}
-
 /**
  * @brief Print any shader compilation errors to the console.
  */
-bool log_err(unsigned int shader_id, std::string type)
-{
-    int success;
-    char info_log[1024];
-    if (type != "PROGRAM")
-    {
-        glGetShaderiv(shader_id, GL_COMPILE_STATUS, &success);
-        if (!success)
-        {
-            glGetShaderInfoLog(shader_id, 1024, NULL, info_log);
-            printf("ERROR::SHADER: Compile-time error: Type: %s\n%s", type.c_str(), info_log);
-        }
-    }
-    else
-    {
-        glGetProgramiv(shader_id, GL_LINK_STATUS, &success);
-        if (!success)
-        {
-            glGetProgramInfoLog(shader_id, 1024, NULL, info_log);
-            printf("ERROR::Shader: Link-time error: Type: %s\n%s", type.c_str(), info_log);
-        }
-    }
-    return success;
-}
+bool log_err(unsigned int shader_id, std::string type);
 
-bool Shader::compile(const char *vert_src, const char *frag_src, const char *geo_src)
+bool shader_load(Shader *out_shader, const char *vert_src, const char *frag_src, const char *geo_src)
 {
     /* Don't compile if either the vertex or fragment shader is null */
     if (vert_src == nullptr || frag_src == nullptr) return false;
@@ -74,19 +40,19 @@ bool Shader::compile(const char *vert_src, const char *frag_src, const char *geo
     }
 
     /* Create the shader program */
-    this->id = glCreateProgram();
+    out_shader->id = glCreateProgram();
 
     /* Attach the compiled shaders */
-    glAttachShader(this->id, vert_shader);
-    glAttachShader(this->id, frag_shader);
+    glAttachShader(out_shader->id, vert_shader);
+    glAttachShader(out_shader->id, frag_shader);
     if (geo_src != nullptr) 
     {
-        glAttachShader(this->id, geo_shader);
+        glAttachShader(out_shader->id, geo_shader);
     }
 
     /* Link the shader program */
-    glLinkProgram(this->id);
-    if (!log_err(this->id, "PROGRAM")) return false;
+    glLinkProgram(out_shader->id);
+    if (!log_err(out_shader->id, "PROGRAM")) return false;
 
     /*
         Finally, delete the shaders once linked.
@@ -102,51 +68,47 @@ bool Shader::compile(const char *vert_src, const char *frag_src, const char *geo
     return true;
 }
 
-#pragma region UNIFORMS
-
-void Shader::set_float(const char* name, float value)
+void shader_use(Shader shader)
 {
-    glUniform1f(glGetUniformLocation(this->id, name), value);
+    glUseProgram(shader.id);
 }
 
-void Shader::set_int(const char* name, int value)
+void shader_uniform_float(Shader shader, const char *name, float value)
 {
-    glUniform1i(glGetUniformLocation(this->id, name), value);
+    glUniform1f(glGetUniformLocation(shader.id, name), value);
 }
 
-void Shader::set_vec2f(const char* name, float x, float y)
+void shader_uniform_int(Shader shader, const char *name, int value)
 {
-    glUniform2f(glGetUniformLocation(this->id, name), x, y);
+    glUniform1i(glGetUniformLocation(shader.id, name), value);
 }
 
-void Shader::set_vec2f(const char* name, const glm::vec2& value)
+void shader_uniform_mat4(Shader shader, const char *name, const glm::mat4 &matrix)
 {
-    glUniform2f(glGetUniformLocation(this->id, name), value.x, value.y);
+    glUniformMatrix4fv(glGetUniformLocation(shader.id, name), 1, false, glm::value_ptr(matrix));
 }
 
-void Shader::set_vec3f(const char* name, float x, float y, float z)
+bool log_err(unsigned int shader_id, std::string type)
 {
-    glUniform3f(glGetUniformLocation(this->id, name), x, y, z);
+    int success;
+    char info_log[1024];
+    if (type != "PROGRAM")
+    {
+        glGetShaderiv(shader_id, GL_COMPILE_STATUS, &success);
+        if (!success)
+        {
+            glGetShaderInfoLog(shader_id, 1024, NULL, info_log);
+            printf("ERROR::SHADER: Compile-time error: Type: %s\n%s", type.c_str(), info_log);
+        }
+    }
+    else
+    {
+        glGetProgramiv(shader_id, GL_LINK_STATUS, &success);
+        if (!success)
+        {
+            glGetProgramInfoLog(shader_id, 1024, NULL, info_log);
+            printf("ERROR::Shader: Link-time error: Type: %s\n%s", type.c_str(), info_log);
+        }
+    }
+    return success;
 }
-
-void Shader::set_vec3f(const char* name, const glm::vec3& value)
-{
-    glUniform3f(glGetUniformLocation(this->id, name), value.x, value.y, value.z);
-}
-
-void Shader::set_vec4f(const char* name, float x, float y, float z, float w)
-{
-    glUniform4f(glGetUniformLocation(this->id, name), x, y, z, w);
-}
-
-void Shader::set_vec4f(const char* name, const glm::vec4& value)
-{
-    glUniform4f(glGetUniformLocation(this->id, name), value.x, value.y, value.z, value.w);
-}
-
-void Shader::set_mat4(const char* name, const glm::mat4& matrix)
-{
-    glUniformMatrix4fv(glGetUniformLocation(this->id, name), 1, false, glm::value_ptr(matrix));
-}
-
-#pragma endregion
