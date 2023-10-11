@@ -1,42 +1,69 @@
 #pragma once
 
+/** Socket ID Type */
 typedef unsigned long long SOCKET;
-struct sockaddr;
-struct sockaddr_in;
 
-/**
- * @brief Setup the program for using Sockets. (necessary for Windows)
- */
-bool socket_setup();
+struct ClientSocket {
+    SOCKET id = 0;
 
-/**
- * @brief Cleanup the sockets of this program. (necessary for Windows)
- */
-void socket_cleanup();
+    ClientSocket();
 
-bool socket_open(short port, unsigned int timeout_ms, SOCKET *out_socket);
-void socket_udp_timeout(SOCKET socket, unsigned int ms);
-void socket_inet_pton(const char* host, sockaddr_in& saddr_in);
-void socket_close(SOCKET socket);
+    /**
+     * @brief Attempt to connect to a remote host.
+     * 
+     * @param addr Server address.
+     * @param port Server port.
+     * @return True when connection was established succesfully.
+     */
+    bool connect(const char* addr, const char* port);
 
-/**
- * @brief Send a msg through a socket.
- * 
- * @param socket The socket to use.
- * @param buf A pointer to the start of the msg data.
- * @param len The length of the msg data buffer.
- * @param target The target address to send the msg to.
- */
-void socket_send(SOCKET socket, const char* buf, int len, const sockaddr_in* target);
+    /**
+     * @brief Send a message to the connected host.
+     * 
+     * @param buf The message buffer.
+     * @param len The length of the message to send in bytes.
+     * @return True when message was send succesfully.
+     */
+    bool send(const char* buf, int len);
 
-/**
- * @brief Receive a msg through a socket.
- * 
- * @param socket The socket to use.
- * @param buf A pointer to the buffer to write the received data into.
- * @param len The length of the receive buffer.
- * @param out_sender Socket address of the sender of the received msg.
- * @param out_len Length of the socket address of the sender.
- * @return True if a msg was received.
- */
-bool socket_recv(SOCKET socket, char* buf, int len, sockaddr* out_sender, int* out_len);
+    /**
+     * @brief Receive n bytes from client.
+     * 
+     * @param out_buf Output buffer.
+     * @param out_len Output buffer length.
+     * @return The number of bytes received.
+     */
+    int recv(char* out_buf, int out_len);
+
+    /**
+     * @brief Close the socket.
+     */
+    void close();
+};
+
+struct ServerSocket {
+    SOCKET id;
+
+    ServerSocket();
+
+    /**
+     * @brief Attempt to bind to a network port.
+     * 
+     * @param port Server port.
+     * @return True when binding was succesful.
+     */
+    bool bind(const char* port);
+
+    /**
+     * @brief Accept incoming clients.
+     * @warning Is blocking!
+     * 
+     * @return nullptr if accepting failed.
+     */
+    ClientSocket* accept();
+
+    /**
+     * @brief Close the socket.
+     */
+    void close();
+};

@@ -1,113 +1,100 @@
 #include "common.h"
 
-// Windows
-#ifdef _WIN32
-#pragma comment(lib,"ws2_32.lib")
-#define WIN32_LEAN_AND_MEAN
-#undef TEXT
+/* Winsock2 library */
+#pragma comment(lib, "Ws2_32.lib")
 #include <winsock2.h>
 #include <ws2tcpip.h>
 
-// Linux
-#else
-#define sprintf_s sprintf
-typedef int SOCKET;
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netdb.h>
-#include <unistd.h>
-#include <arpa/inet.h>
-static const int INVALID_SOCKET = -1;
-static const int SOCKET_ERROR   = -1;
-#endif
-
-#include <stdio.h>
-
-bool socket_setup()
+ClientSocket::ClientSocket()
 {
-#ifdef _WIN32
-    WSADATA wsaData;
-    int err = WSAStartup(MAKEWORD(2, 2), &wsaData);
-    if (err != 0) 
-    {
-        printf("WSAStartup() failed with error: %d\n", err);
+    /* Startup winsock */
+    WSADATA wsa_data;
+	assert(!WSAStartup(MAKEWORD(2, 0), &wsa_data));
+
+    /* Create the socket */
+	this->id = socket(AF_INET, SOCK_STREAM, 0);
+}
+
+bool ClientSocket::connect(const char* addr, const char* port)
+{
+    SOCKADDR_IN sockaddr;
+
+    /* Get the internet address of the server */
+    inet_pton(AF_INET, addr, &sockaddr.sin_addr.s_addr);
+
+	sockaddr.sin_family = AF_INET;
+	sockaddr.sin_port = htons(atoi(port));
+
+    return ::connect(id, reinterpret_cast<SOCKADDR *>(&sockaddr), sizeof(sockaddr)) <= 0;
+}
+
+bool ClientSocket::send(const char* buf, int len)
+{
+    return ::send(id, buf, len, 0) <= 0;
+}
+
+int ClientSocket::recv(char* out_buf, int out_len)
+{
+    return ::recv(id, out_buf, out_len, 0);
+}
+
+void ClientSocket::close()
+{
+    closesocket(id);
+	// WSACleanup();
+}
+
+ServerSocket::ServerSocket()
+{
+    /* Startup winsock */
+    WSADATA wsa_data;
+	assert(!WSAStartup(MAKEWORD(2, 2), &wsa_data));
+
+    /* Create the socket */
+	this->id = socket(AF_INET, SOCK_STREAM, 0);
+}
+
+bool ServerSocket::bind(const char* port)
+{
+	SOCKADDR_IN addr;
+    addr.sin_addr.s_addr = INADDR_ANY;
+	addr.sin_family = AF_INET;
+	addr.sin_port = htons(atoi(port));
+
+    /* Bind the socket, and start listening */
+	if (::bind(id, reinterpret_cast<SOCKADDR *>(&addr), sizeof(addr)) > 0) {
         return false;
     }
-#endif
-    return true;
+	return ::listen(id, 0) <= 0;
 }
 
-void socket_cleanup()
+ClientSocket* ServerSocket::accept()
 {
-#ifdef _WIN32
-    WSACleanup();
-#endif
+    SOCKET client;
+
+    SOCKADDR_IN client_addr;
+    int client_addr_len = sizeof(SOCKADDR_IN);
+
+    /* Block until client connects */
+    SOCKET client_socket = ::accept(id, reinterpret_cast<SOCKADDR *>(&client_addr), &client_addr_len);
+
+    /* Return 'nullptr' if the socket is invalid */
+    if (client_socket == INVALID_SOCKET) return nullptr;
+
+    /* Otherwise return a new client socket */
+    ClientSocket* socket = new ClientSocket();
+    socket->id = client_socket;
+    return socket;
+
+    // const int last_error = WSAGetLastError();
+    // if(last_error > 0)
+    // {
+    //     std::cout << "Error: " << last_error << std::endl;
+    // }
 }
 
-bool socket_open(short port, unsigned int timeout_ms, SOCKET *out_socket)
+void ServerSocket::close()
 {
-    /* Create the new socket */
-    *out_socket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
-    if (*out_socket == INVALID_SOCKET) {
-        printf("socket() failed");
-        return false;
-    }
-
-    /* Prepare the socket address */
-    struct sockaddr_in server;
-    server.sin_family = AF_INET;
-    server.sin_addr.s_addr = INADDR_ANY;
-    server.sin_port = htons(port);
-
-    /* Bind the new socket to the correct address */
-    if (bind(*out_socket, reinterpret_cast<struct sockaddr *>(&server), sizeof(server)) == SOCKET_ERROR) {
-        printf("bind() failed");
-        return false;
-    }
-
-    socket_udp_timeout(*out_socket, timeout_ms);
-
-    return true;
-}
-
-void socket_udp_timeout(SOCKET socket, unsigned int ms)
-{
-#ifdef _WIN32
-    setsockopt(socket, SOL_SOCKET, SO_RCVTIMEO, reinterpret_cast<char*>(&ms), sizeof(ms));
-#else
-    struct timeval timeout;
-    timeout.tv_sec = ms / 1000;
-    timeout.tv_usec = (ms * 1000) % 1000000;
-    setsockopt(socket, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout));
-#endif
-}
-
-void socket_inet_pton(const char* host, sockaddr_in& saddr_in)
-{
-#ifdef _WIN32
-    WCHAR wsz[64];
-    swprintf_s(wsz, L"%S", host);
-    InetPton(AF_INET, reinterpret_cast<char*>(wsz), &(saddr_in.sin_addr.s_addr));
-#else
-    inet_pton(AF_INET, host, &(saddr_in.sin_addr));
-#endif
-}
-
-void socket_close(SOCKET socket)
-{
-#ifdef _WIN32
-    closesocket(socket);
-#else
-    close(socket);
-#endif
-}
-
-void socket_send(SOCKET socket, const char* buf, int len, const sockaddr_in* target)
-{
-    sendto(socket, buf, len, 0, reinterpret_cast<const sockaddr*>(target), sizeof(*target));
-}
-
-bool socket_recv(SOCKET socket, char* buf, int len, sockaddr* out_sender, int* out_len)
-{
-    return recvfrom(socket, buf, len, 0, out_sender, out_len) == *out_len;
+    closesocket(id);
+	// WSACleanup();
 }
