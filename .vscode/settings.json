@@ -62,7 +62,13 @@
         "xstddef": "cpp",
         "xtr1common": "cpp",
         "xtree": "cpp",
-        "*.frag": "cpp"
+        "*.frag": "cpp",
+        "thread": "cpp",
+        "functional": "cpp",
+        "iostream": "cpp",
+        "stop_token": "cpp",
+        "unordered_map": "cpp",
+        "xhash": "cpp"
     },
     "cmake.buildDirectory": "${workspaceFolder}/bin",
     "C_Cpp.clang_format_fallbackStyle": "Google",
