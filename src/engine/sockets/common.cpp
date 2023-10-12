@@ -22,6 +22,9 @@ bool ClientSocket::connect(const char* addr, const char* port)
     /* Get the internet address of the server */
     inet_pton(AF_INET, addr, &sockaddr.sin_addr.s_addr);
 
+    uint32_t msec = 0;
+    setsockopt(id, SOL_SOCKET, SO_RCVTIMEO, (char *) &msec, sizeof(msec));
+
 	sockaddr.sin_family = AF_INET;
 	sockaddr.sin_port = htons(atoi(port));
 
@@ -30,7 +33,7 @@ bool ClientSocket::connect(const char* addr, const char* port)
 
 bool ClientSocket::send(const char* buf, int len)
 {
-    return ::send(id, buf, len, 0) <= 0;
+    return ::send(id, buf, len, 0) > 0;
 }
 
 int ClientSocket::recv(char* out_buf, int out_len)

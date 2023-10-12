@@ -7,6 +7,7 @@
 #include <glm/glm.hpp>
 #include <string>
 #include <thread>
+#include <vector>
 #include <iostream>
 
 #ifdef _WIN32
@@ -108,12 +109,15 @@ int main(int argc, char** argv)
 
     char in_address[128] = "127.0.0.1";
     char in_port[16] = "1440";
+    char in_msg[128] = "";
 
     bool selected = false;
     char msg[64] = "";
 
     std::thread* net_th = nullptr;
     std::atomic_bool should_exit = false;
+    std::atomic_bool msg_queued = false;
+    std::vector<std::string> msg_log;
 
     int alive = 1;
     while (alive) {
@@ -151,16 +155,25 @@ int main(int argc, char** argv)
 
             if (ImGui::Button("Host")) {
                 selected = true;
-                strcpy(msg, "Hosting server...");
-                net_th = new std::thread(net_thread, &should_exit, NetType::SERVER, "127.0.0.1", in_port);
+                strcpy(msg, "Hosting server.");
+                net_th = new std::thread(net_thread, &should_exit, &msg_queued, &msg_log, in_msg, NetType::SERVER, "127.0.0.1", in_port);
             }
             if (ImGui::Button("Connect")) {
                 selected = true;
-                strcpy(msg, "Connecting to server...");
-                net_th = new std::thread(net_thread, &should_exit, NetType::CLIENT, in_address, in_port);
+                strcpy(msg, "Connected to server.");
+                net_th = new std::thread(net_thread, &should_exit, &msg_queued, &msg_log, in_msg, NetType::CLIENT, in_address, in_port);
             }
         } else {
             ImGui::Text("%s", msg);
+            ImGui::InputText("Message", in_msg, IM_ARRAYSIZE(in_msg));
+            if (ImGui::Button("Send")) {
+                msg_queued = true;
+            }
+            ImGui::BeginChild("Msg Log");
+            ImGui::Text("This is the log:");
+            for (std::string str : msg_log)
+                ImGui::Text("%s", str.c_str());
+            ImGui::EndChild();
         }
         ImGui::End();
 
