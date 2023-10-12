@@ -65,7 +65,16 @@ bool ServerSocket::bind(const char* port)
 	if (::bind(id, reinterpret_cast<SOCKADDR *>(&addr), sizeof(addr)) > 0) {
         return false;
     }
-	return ::listen(id, 0) <= 0;
+	if (::listen(id, 0) > 0) {
+        return false;
+    }
+
+    /* Mark the socket as non-blocking */
+    u_long NonBlock = 1;
+    if (ioctlsocket(id, FIONBIO, &NonBlock) == SOCKET_ERROR) {
+        return false;
+    }
+    return true;
 }
 
 ClientSocket* ServerSocket::accept()

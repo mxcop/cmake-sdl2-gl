@@ -23,6 +23,8 @@
 #include "engine/texture.h"
 #include "engine/sockets/common.h"
 
+#include "game/net.h"
+
 int exit(int code, SDL_GLContext context, SDL_Window *window) {
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplSDL2_Shutdown();
@@ -104,36 +106,14 @@ int main(int argc, char** argv)
 
     Sprite sprite = sprite_from(shader, texture);
 
-    /* Socket server */
-    ServerSocket server = ServerSocket();
-    if (server.bind("1440") == false) {
-        perror("Error binding server!\n");
-        return exit(-1, context, window);
-    }
+    char in_address[128] = "127.0.0.1";
+    char in_port[16] = "1440";
 
-    auto f = [&]() {
-        ClientSocket* client = server.accept();
-        char buf[128] = {};
-        if (client != nullptr) {
-            while(client->recv(buf, 128) > 0) {
-                std::cout << "Client says: " << buf << std::endl;
-                client->send("Copy that!", 11);
-                memset(buf, 0, 128);
-            }
-            client->close();
-        }
-        server.close();
-    };
+    bool selected = false;
+    char msg[64] = "";
 
-    std::thread th1(f);
-
-    /* Socket client */
-    ClientSocket client = ClientSocket();
-    if (client.connect("127.0.0.1", "1440") == false) {
-        perror("Error connecting to server!\n");
-        return exit(-1, context, window);
-    }
-    client.send("Hello, world!", 14);
+    std::thread* net_th = nullptr;
+    std::atomic_bool should_exit = false;
 
     int alive = 1;
     while (alive) {
@@ -144,13 +124,13 @@ int main(int argc, char** argv)
                 case SDL_QUIT: alive = 0; break;
                 case SDL_KEYUP:
                     if (event.key.keysym.sym == SDLK_ESCAPE) { alive = 0; }
-                    if (event.key.keysym.sym == SDLK_SPACE) { 
-                        client.send("Jump!", 6); 
-                        char buf[128] = {};
-                        client.recv(buf, 128);
-                        SDL_Delay(5);
-                        std::cout << "Server says: " << buf << std::endl;
-                    }
+                    // if (event.key.keysym.sym == SDLK_SPACE) { 
+                    //     client.send("Jump!", 6); 
+                    //     char buf[128] = {};
+                    //     client.recv(buf, 128);
+                    //     SDL_Delay(5);
+                    //     std::cout << "Server says: " << buf << std::endl;
+                    // }
                     break;
                 default: break;
             }
@@ -161,11 +141,30 @@ int main(int argc, char** argv)
         ImGui_ImplSDL2_NewFrame();
         ImGui::NewFrame();
 
-        ImGui::Begin("Hello, world!");
+        /* Socket Debug Window */
+        ImGui::Begin("Multiplayer [Debugger]");
         ImGui::SetWindowFontScale(1.5f);
-        ImGui::Text("This is some useful text.");
+        if (selected == false) {
+            ImGui::Text("Enter address & port below to start or connect to a server.");
+            ImGui::InputText("Address", in_address, IM_ARRAYSIZE(in_address));
+            ImGui::InputText("Port", in_port, IM_ARRAYSIZE(in_port));
+
+            if (ImGui::Button("Host")) {
+                selected = true;
+                strcpy(msg, "Hosting server...");
+                net_th = new std::thread(net_thread, &should_exit, NetType::SERVER, "127.0.0.1", in_port);
+            }
+            if (ImGui::Button("Connect")) {
+                selected = true;
+                strcpy(msg, "Connecting to server...");
+                net_th = new std::thread(net_thread, &should_exit, NetType::CLIENT, in_address, in_port);
+            }
+        } else {
+            ImGui::Text("%s", msg);
+        }
         ImGui::End();
 
+        /* Render ImGui */
         ImGui::Render();
         glClearColor(0.105f, 0.105f, 0.105f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
@@ -180,8 +179,11 @@ int main(int argc, char** argv)
         SDL_Delay(5);
     };
 
-    client.close();
-    th1.join();
+    should_exit = true;
+    flushall();
+    if (net_th) net_th->join();
+    // client.close();
+    // th1.join();
 
     return exit(0, context, window);
 }
