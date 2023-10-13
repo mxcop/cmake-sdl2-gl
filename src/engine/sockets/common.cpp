@@ -28,6 +28,12 @@ bool ClientSocket::connect(const char* addr, const char* port)
 	sockaddr.sin_family = AF_INET;
 	sockaddr.sin_port = htons(atoi(port));
 
+    /* Mark the socket as non-blocking */
+    u_long NonBlock = 1;
+    if (ioctlsocket(id, FIONBIO, &NonBlock) == SOCKET_ERROR) {
+        return false;
+    }
+
     return ::connect(id, reinterpret_cast<SOCKADDR *>(&sockaddr), sizeof(sockaddr)) <= 0;
 }
 
@@ -68,7 +74,7 @@ bool ServerSocket::bind(const char* port)
 	if (::bind(id, reinterpret_cast<SOCKADDR *>(&addr), sizeof(addr)) > 0) {
         return false;
     }
-	if (::listen(id, 0) > 0) {
+	if (::listen(id, 0) > 0) { 
         return false;
     }
 
@@ -86,7 +92,7 @@ ClientSocket* ServerSocket::accept()
 
     SOCKADDR_IN client_addr;
     int client_addr_len = sizeof(SOCKADDR_IN);
-
+    
     /* Block until client connects */
     SOCKET client_socket = ::accept(id, reinterpret_cast<SOCKADDR *>(&client_addr), &client_addr_len);
 
