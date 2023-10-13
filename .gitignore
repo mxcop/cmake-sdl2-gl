@@ -4,3 +4,6 @@
 
 # assets dir
 !/assets
+
+# imgui
+imgui.ini
