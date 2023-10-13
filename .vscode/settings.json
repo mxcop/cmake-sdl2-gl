@@ -74,4 +74,5 @@
     "C_Cpp.clang_format_fallbackStyle": "Google",
     "dotnet.defaultSolution": "disable",
     "cmake.configureOnOpen": false,
+    "cmake.revealLog": "never"
 }

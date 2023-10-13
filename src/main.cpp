@@ -190,10 +190,18 @@ int main(int argc, char** argv)
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
         SDL_GL_SwapWindow(window);
         SDL_Delay(5);
+
+#ifdef _DEBUG
+        flushall();
+#endif
     };
 
     should_exit = true;
-    flushall();
+
+#ifdef _DEBUG
+        flushall();
+#endif
+
     if (net_th) net_th->join();
     // client.close();
     // th1.join();
