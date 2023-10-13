@@ -8,55 +8,41 @@
 #include "../engine/sockets/common.h"
 
 void net_client(std::atomic_bool* should_exit, std::atomic_bool* msg_queued,
-                std::vector<std::string>* msg_log, const char* msg, const char* addr, const char* port)
+                std::vector<std::string>* msg_log, const char* msg,
+                const char* addr, const char* port)
 {
+    /* Create the client socket and connect to the server */
     ClientSocket client = ClientSocket();
     if (client.connect(addr, port) == false) {
         perror("Error connecting to server!\n");
         return;
     }
 
-    // client.send("Hello, world!", 14);
     char buf[128] = {};
-
     for (;;) {
         if (*should_exit) break;
 
+        /* Receive incoming message if there is one */
         if (client.recv(buf, 128) > 0) {
             printf("[Client] received : %s\n", buf);
             msg_log->push_back(std::string(buf));
             memset(buf, 0, 128);
         }
 
-        if (*msg_queued == false) continue;
+        /* Send a message if it was queued */
+        if (*msg_queued) {
+            *msg_queued = false;
 
-        if (client.send(msg, 128) == false) break;
-        msg_log->push_back(std::string(msg));
-        *msg_queued = false;
+            if (client.send(msg, 128) == false) break;
+            msg_log->push_back(std::string(msg));
+        }
     }
 
     client.close();
 }
 
-// void net_handle_client(std::atomic_bool* should_exit,
-//                        std::vector<std::string>* msg_log, ClientSocket* client)
-// {
-//     char buf[128] = {};
-//     for (;;) {
-//         if (*should_exit) break;
-//         if (client->recv(buf, 128) <= 0) continue;
-
-//         printf("[Server] received : %s\n", buf);
-//         msg_log->push_back(std::string(buf));
-//         memset(buf, 0, 128);
-//     }
-
-//     client->close();
-//     delete client;
-// }
-
-void net_server(std::atomic_bool* should_exit,
-                std::vector<std::string>* msg_log, const char* port)
+void net_server(std::atomic_bool* should_exit, std::atomic_bool* msg_queued,
+                std::vector<std::string>* msg_log, const char* msg, const char* port)
 {
     ServerSocket server = ServerSocket();
     if (server.bind(port) == false) {
@@ -71,22 +57,23 @@ void net_server(std::atomic_bool* should_exit,
     for (;;) {
         if (*should_exit) break;
 
+        /* Accept incoming client */
         ClientSocket* client = server.accept();
         if (client) {
             printf("[Server] client connected.\n");
             clients.push_back(client);
         }
 
-        for (ClientSocket* client : clients)
-        {
+        /* Check if any message were send by clients */
+        for (ClientSocket* client : clients) {
             if (client == nullptr) continue;
 
             if (client->recv(buf, 128) <= 0) continue;
 
             printf("[Server] received : %s\n", buf);
 
-            for (ClientSocket* other_client : clients)
-            {
+            /* Echo message to all other clients */
+            for (ClientSocket* other_client : clients) {
                 if (other_client == nullptr) continue;
                 if (client->id == other_client->id) continue;
 
@@ -95,6 +82,18 @@ void net_server(std::atomic_bool* should_exit,
 
             msg_log->push_back(std::string(buf));
             memset(buf, 0, 128);
+        }
+
+        /* Send a message if it was queued */
+        if (*msg_queued) {
+            *msg_queued = false;
+
+            for (ClientSocket* client : clients) {
+                if (client == nullptr) continue;
+                client->send(msg, 128);
+            }
+            
+            msg_log->push_back(std::string(msg));
         }
     }
 
@@ -123,7 +122,7 @@ void net_thread(std::atomic_bool* should_exit, std::atomic_bool* msg_queued,
         case NetType::SERVER:
             printf("Server hosting at 127.0.0.1:%s\n", port);
 
-            net_server(should_exit, msg_log, port);
+            net_server(should_exit, msg_queued, msg_log, msg, port);
             break;
 
         default: break;

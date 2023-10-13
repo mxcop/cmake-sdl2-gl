@@ -18,7 +18,7 @@ struct ClientSocket {
     bool connect(const char* addr, const char* port);
 
     /**
-     * @brief Send a message to the connected host.
+     * @brief Send a message to the connected host. (non-blocking)
      * 
      * @param buf The message buffer.
      * @param len The length of the message to send in bytes.
@@ -27,7 +27,7 @@ struct ClientSocket {
     bool send(const char* buf, int len);
 
     /**
-     * @brief Receive n bytes from client.
+     * @brief Receive n bytes from client. (non-blocking)
      * 
      * @param out_buf Output buffer.
      * @param out_len Output buffer length.
@@ -55,8 +55,7 @@ struct ServerSocket {
     bool bind(const char* port);
 
     /**
-     * @brief Accept incoming clients.
-     * @warning Is blocking!
+     * @brief Accept incoming clients. (non-blocking)
      * 
      * @return nullptr if accepting failed.
      */

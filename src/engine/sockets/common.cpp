@@ -22,6 +22,7 @@ bool ClientSocket::connect(const char* addr, const char* port)
     /* Get the internet address of the server */
     inet_pton(AF_INET, addr, &sockaddr.sin_addr.s_addr);
 
+    /* Set the socket timeout */
     uint32_t msec = 0;
     setsockopt(id, SOL_SOCKET, SO_RCVTIMEO, (char *) &msec, sizeof(msec));
 
