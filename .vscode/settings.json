@@ -70,7 +70,7 @@
         "unordered_map": "cpp",
         "xhash": "cpp"
     },
-    "cmake.buildDirectory": "${workspaceFolder}/bin",
+    "cmake.buildDirectory": "${workspaceFolder}/build",
     "C_Cpp.clang_format_fallbackStyle": "Google",
     "dotnet.defaultSolution": "disable",
     "cmake.configureOnOpen": false,

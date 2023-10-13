@@ -6,7 +6,11 @@
             "includePath": [
                 "inc",
                 "src",
-                "extern/**"
+                "extern/glad/include",
+                "extern/glm",
+                "extern/imgui",
+                "extern/imgui/backends",
+                "extern/sdl/include"
             ],
             "forcedInclude": [
                 "extern/glm/glm/fwd.hpp",

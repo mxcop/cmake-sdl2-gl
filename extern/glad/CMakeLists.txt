@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required(VERSION 3.15)
 project(glad)
 
 add_library(glad include/glad/gl.h src/gl.c)

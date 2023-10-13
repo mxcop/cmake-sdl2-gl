@@ -1,5 +1,6 @@
 [submodule "sdl"]
 	path = extern/sdl
+	branch = SDL2
 	url = https://github.com/libsdl-org/SDL.git
 [submodule "glm"]
 	path = extern/glm

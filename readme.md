@@ -1,14 +1,17 @@
-Generate project files :
-```
-$ cmake -S . -B bin
-```
+# SDL + OpenGL Game Template
 
-Build the project :
-```
-$ cmake --build bin
-```
+## Prerequisites
+- `CMake` VERSION 3.15^
 
-Build the project (release) :
+## Using VScode
+For the best VScode experience install the
+[`C/C++ Extension Pack`](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cpptools-extension-pack).
+
+## Building the Game
+`~` refers to the directory `readme.md` is in.
+```sh
+$ cmake -S ~ -B ~/build
+
+$ cmake --build ~/build --config <config>
 ```
-$ cmake --build bin --config Release
-```
+`<config>` can be `Release` or `Debug` (default)
