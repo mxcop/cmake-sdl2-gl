@@ -1,19 +1,19 @@
 #include "texture.h"
 
 #define STB_IMAGE_IMPLEMENTATION
-#include <stb_image.h>
 #include <filesystem>
 #include <glad/gl.h>
+#include <stb_image.h>
 
 /**
  * @brief Convert a relative path to an absolute one.
  */
-std::string relative_path(const char* p)
+std::string relative_path(const char *p)
 {
-	return std::filesystem::absolute(p).string();
+    return std::filesystem::absolute(p).string();
 }
 
-bool texture_load(Texture* out_tex, const char* file_path)
+bool texture_load(Texture *out_tex, const char *file_path)
 {
     /* Assert if the output texture pointer is a nullptr */
     assert(out_tex != nullptr);
@@ -23,7 +23,7 @@ bool texture_load(Texture* out_tex, const char* file_path)
 
     /* Load the image file */
     int nr_channels = 0;
-    uint8_t* data = stbi_load(path.c_str(), &out_tex->width, &out_tex->height, &nr_channels, 0);
+    uint8_t *data = stbi_load(path.c_str(), &out_tex->width, &out_tex->height, &nr_channels, 0);
 
     /* Check if loading the file caused an error */
     if (stbi_failure_reason() != nullptr)

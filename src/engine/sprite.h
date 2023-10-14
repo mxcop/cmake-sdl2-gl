@@ -4,7 +4,8 @@
 #include "shader.h"
 #include "texture.h"
 
-struct Sprite {
+struct Sprite
+{
     Shader shader;
     Texture tex;
 

@@ -1,6 +1,7 @@
 #pragma once
 
-struct Texture {
+struct Texture
+{
     uint32_t id = 0;
 
     /* Dimensions in pixels */
@@ -14,7 +15,7 @@ struct Texture {
  * @param file_path The relative file path to the image.
  * @return True if the texture was loaded succesfully.
  */
-bool texture_load(Texture* out_tex, const char* file_path);
+bool texture_load(Texture *out_tex, const char *file_path);
 
 /**
  * @brief Bind an OpenGL texture.
@@ -22,4 +23,4 @@ bool texture_load(Texture* out_tex, const char* file_path);
  * @param tex The texture to bind.
  * @param bind_id The ID to bind the texture to. (default 0)
  */
-void texture_bind(const Texture* tex, int bind_id = 0);
+void texture_bind(const Texture *tex, int bind_id = 0);

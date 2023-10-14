@@ -14,7 +14,8 @@ bool log_err(unsigned int shader_id, std::string type);
 bool shader_load(Shader *out_shader, const char *vert_src, const char *frag_src, const char *geo_src)
 {
     /* Don't compile if either the vertex or fragment shader is null */
-    if (vert_src == nullptr || frag_src == nullptr) return false;
+    if (vert_src == nullptr || frag_src == nullptr)
+        return false;
 
     GLuint vert_shader, frag_shader, geo_shader;
 
@@ -22,21 +23,24 @@ bool shader_load(Shader *out_shader, const char *vert_src, const char *frag_src,
     vert_shader = glCreateShader(GL_VERTEX_SHADER);
     glShaderSource(vert_shader, 1, &vert_src, NULL);
     glCompileShader(vert_shader);
-    if (!log_err(vert_shader, "VERTEX")) return false;
+    if (!log_err(vert_shader, "VERTEX"))
+        return false;
 
     /* Compile fragment shader */
     frag_shader = glCreateShader(GL_FRAGMENT_SHADER);
     glShaderSource(frag_shader, 1, &frag_src, NULL);
     glCompileShader(frag_shader);
-    if (!log_err(frag_shader, "FRAGMENT")) return false;
+    if (!log_err(frag_shader, "FRAGMENT"))
+        return false;
 
-    if (geo_src != nullptr) 
+    if (geo_src != nullptr)
     {
         /* Compile geometry shader */
         geo_shader = glCreateShader(GL_GEOMETRY_SHADER);
         glShaderSource(geo_shader, 1, &geo_src, NULL);
         glCompileShader(geo_shader);
-        if (!log_err(geo_shader, "GEOMETRY")) return false;
+        if (!log_err(geo_shader, "GEOMETRY"))
+            return false;
     }
 
     /* Create the shader program */
@@ -45,14 +49,15 @@ bool shader_load(Shader *out_shader, const char *vert_src, const char *frag_src,
     /* Attach the compiled shaders */
     glAttachShader(out_shader->id, vert_shader);
     glAttachShader(out_shader->id, frag_shader);
-    if (geo_src != nullptr) 
+    if (geo_src != nullptr)
     {
         glAttachShader(out_shader->id, geo_shader);
     }
 
     /* Link the shader program */
     glLinkProgram(out_shader->id);
-    if (!log_err(out_shader->id, "PROGRAM")) return false;
+    if (!log_err(out_shader->id, "PROGRAM"))
+        return false;
 
     /*
         Finally, delete the shaders once linked.
@@ -60,7 +65,7 @@ bool shader_load(Shader *out_shader, const char *vert_src, const char *frag_src,
     */
     glDeleteShader(vert_shader);
     glDeleteShader(frag_shader);
-    if (geo_src != nullptr) 
+    if (geo_src != nullptr)
     {
         glDeleteShader(geo_shader);
     }

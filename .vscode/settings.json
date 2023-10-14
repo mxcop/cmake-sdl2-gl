@@ -76,12 +76,26 @@
     "cmake.revealLog": "never",
     "cmake.launchBehavior": "breakAndReuseTerminal",
     "cmake.statusbar.advanced": {
-        "build":{"visibility": "hidden"},
-        "launchTarget": {"visibility": "hidden"},
-        "buildTarget": {"visibility": "hidden"},
-        "status": {"visibility": "compact"},
-        "debug": {"visibility": "icon"},
-        "kit": {"visibility": "compact", "length": 14}
+        "build": {
+            "visibility": "hidden"
+        },
+        "launchTarget": {
+            "visibility": "hidden"
+        },
+        "buildTarget": {
+            "visibility": "hidden"
+        },
+        "status": {
+            "visibility": "compact"
+        },
+        "debug": {
+            "visibility": "icon"
+        },
+        "kit": {
+            "visibility": "compact",
+            "length": 14
+        }
     },
-    "debug.showInStatusBar": "never"
+    "debug.showInStatusBar": "never",
+    "editor.formatOnSave": true
 }
